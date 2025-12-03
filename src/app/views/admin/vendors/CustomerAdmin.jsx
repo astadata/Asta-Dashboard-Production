@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { apiCall } from "app/utils/apiConfig";
 import { useNavigate } from 'react-router-dom';
+import { apiCall } from "app/utils/apiConfig";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -45,7 +47,7 @@ export default function CustomerAdmin() {
 
   async function loadVendors() {
     try {
-      const res = await fetch('/api/vendors');
+      const res = await apiCall('/api/vendors');
       const data = await res.json();
       setVendors(data);
     } catch (err) {
@@ -57,7 +59,7 @@ export default function CustomerAdmin() {
   async function loadCustomers() {
     setCustLoading(true);
     try {
-      const res = await fetch('/api/customers?includeVendorServices=true');
+      const res = await apiCall('/api/customers?includeVendorServices=true');
       const data = await res.json();
       
       // Transform customers to show all their vendor-service mappings
@@ -92,7 +94,7 @@ export default function CustomerAdmin() {
   async function deleteCustomer(mappingId) {
     try {
       // Delete the specific customer-vendor-service mapping
-      await fetch(`/api/customer-vendor-services/${mappingId}`, { method: 'DELETE' });
+      await apiCall(`/api/customer-vendor-services/${mappingId}`, { method: 'DELETE' });
       loadCustomers();
     } catch (e) { console.error(e); }
   }
@@ -147,7 +149,7 @@ export default function CustomerAdmin() {
 
     try {
       // Step 1: Create/update the customer (one record per email)
-      const customerRes = await fetch('/api/customers', {
+      const customerRes = await apiCall('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -166,7 +168,7 @@ export default function CustomerAdmin() {
       }
 
       // Step 2: Get service IDs for the mappings
-      const servicesRes = await fetch('/api/services');
+      const servicesRes = await apiCall('/api/services');
       const allServices = await servicesRes.json();
 
       // Step 3: Create customer-vendor-service mappings
@@ -268,7 +270,7 @@ export default function CustomerAdmin() {
           password: editCustomer.password
         };
 
-        const customerRes = await fetch(`/api/customers/${editCustomer.id}`, {
+        const customerRes = await apiCall(`/api/customers/${editCustomer.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(customerPayload)
@@ -283,7 +285,7 @@ export default function CustomerAdmin() {
       }
 
       // Step 2: Get service ID
-      const servicesRes = await fetch('/api/services');
+      const servicesRes = await apiCall('/api/services');
       const services = await servicesRes.json();
       const service = services.find(s => s.name === editCustomer.service && s.vendor_id === editCustomer.vendorId);
       
@@ -301,7 +303,7 @@ export default function CustomerAdmin() {
         subuser_id: editCustomer.subuserId
       };
 
-      const mappingRes = await fetch(`/api/customer-vendor-services/${editCustomer.mappingId}`, {
+      const mappingRes = await apiCall(`/api/customer-vendor-services/${editCustomer.mappingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mappingPayload)

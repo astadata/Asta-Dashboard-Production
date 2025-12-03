@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { apiCall } from "app/utils/apiConfig";
 import { useNavigate } from 'react-router-dom';
+import { apiCall } from "app/utils/apiConfig";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -52,7 +54,7 @@ export default function AdminVendors() {
   async function loadVendors() {
     setLoading(true);
     try {
-      const res = await fetch('/api/vendors');
+      const res = await apiCall('/api/vendors');
       const data = await res.json();
       setVendors(data);
     } catch (err) {
@@ -65,7 +67,7 @@ export default function AdminVendors() {
   async function fetchUsage(v) {
     setFetching((s) => ({ ...s, [v.id]: true }));
     try {
-      const res = await fetch(`/api/vendors/${v.id}/usage`);
+      const res = await apiCall(`/api/vendors/${v.id}/usage`);
       const json = await res.json();
       setResults((r) => ({ ...r, [v.id]: json }));
     } catch (err) {
@@ -78,7 +80,7 @@ export default function AdminVendors() {
   async function fetchRaw(v) {
     setFetching((s) => ({ ...s, [v.id]: true }));
     try {
-      const res = await fetch(`/api/vendors/${v.id}/fetch?path=/usage`);
+      const res = await apiCall(`/api/vendors/${v.id}/fetch?path=/usage`);
       const json = await res.json();
       setResults((r) => ({ ...r, [v.id]: json }));
     } catch (err) {
@@ -92,7 +94,7 @@ export default function AdminVendors() {
   async function loadCustomers() {
     setCustLoading(true);
     try {
-      const res = await fetch('/api/customers?includeVendorServices=true');
+      const res = await apiCall('/api/customers?includeVendorServices=true');
       const data = await res.json();
       
       // Expand customers to show all their vendor-service mappings
@@ -159,7 +161,7 @@ export default function AdminVendors() {
       console.log('Submitting form:', form);
       
       // Step 1: Create/update the customer (one record per email)
-      const customerRes = await fetch('/api/customers', {
+      const customerRes = await apiCall('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -178,7 +180,7 @@ export default function AdminVendors() {
       }
       
       // Step 2: Get service ID
-      const servicesRes = await fetch('/api/services');
+      const servicesRes = await apiCall('/api/services');
       const services = await servicesRes.json();
       const service = services.find(s => s.name === form.service && s.vendor_id === form.vendorId);
       
@@ -189,7 +191,7 @@ export default function AdminVendors() {
       }
       
       // Step 3: Create customer-vendor-service mapping
-      const mappingRes = await fetch('/api/customer-vendor-services', {
+      const mappingRes = await apiCall('/api/customer-vendor-services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -226,7 +228,7 @@ export default function AdminVendors() {
 
   async function deleteCustomer(id) {
     try {
-      await fetch(`/api/customers/${id}`, { method: 'DELETE' });
+      await apiCall(`/api/customers/${id}`, { method: 'DELETE' });
       loadCustomers();
     } catch (e) { console.error(e); }
   }
@@ -276,7 +278,7 @@ export default function AdminVendors() {
 
     try {
       // Step 1: Create/update the customer (one record per email)
-      const customerRes = await fetch('/api/customers', {
+      const customerRes = await apiCall('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -295,7 +297,7 @@ export default function AdminVendors() {
       }
       
       // Step 2: Get service IDs
-      const servicesRes = await fetch('/api/services');
+      const servicesRes = await apiCall('/api/services');
       const services = await servicesRes.json();
       
       // Step 3: Create all mappings
@@ -393,7 +395,7 @@ export default function AdminVendors() {
       // only include password if provided
       if (editCustomer.password) payload.password = editCustomer.password;
 
-      const res = await fetch(`/api/customers/${editCustomer.id}`, {
+      const res = await apiCall(`/api/customers/${editCustomer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

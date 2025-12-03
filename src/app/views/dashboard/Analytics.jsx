@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import { styled, useTheme } from "@mui/material/styles";
 
 import { VENDORS, SERVICES } from "app/utils/vendorServiceConfig";
+import { apiCall } from "app/utils/apiConfig";
 import useAuth from "app/hooks/useAuth";
 import StatCards from "./shared/StatCards";
 import TopSellingTable, { usageList } from "./shared/TopSellingTable";
@@ -105,7 +106,7 @@ export default function Analytics() {
   useEffect(() => {
     async function loadVendors() {
       try {
-        const res = await fetch('/api/vendors');
+        const res = await apiCall('/api/vendors');
         const data = await res.json();
         setVendorsList(data);
       } catch (err) {
@@ -121,7 +122,7 @@ export default function Analytics() {
       if (!isAdmin) return;
       
       try {
-        const res = await fetch('/api/customers?includeVendorServices=true');
+        const res = await apiCall('/api/customers?includeVendorServices=true');
         const data = await res.json();
         
         // Transform each customer's vendorServices into allMappings format
@@ -224,7 +225,7 @@ export default function Analytics() {
       try {
 
         // Fetch rate for this customer/vendor/service combination
-        const res = await fetch(`/api/customer-rates/customer/${currentMapping.id}`);
+        const res = await apiCall(`/api/customer-rates/customer/${currentMapping.id}`);
         if (res.ok) {
           const rates = await res.json();
           // Find matching rate for current vendor and service

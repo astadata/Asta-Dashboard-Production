@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiCall } from "app/utils/apiConfig";
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -23,12 +24,12 @@ export default function VendorsList() {
   async function load() {
     setLoading(true);
     try {
-      const res = await fetch('/api/vendors');
+      const res = await apiCall('/api/vendors');
       const data = await res.json();
       setVendors(data);
 
       if (user?.email) {
-        const r2 = await fetch(`/api/customers?email=${encodeURIComponent(user.email)}&includeVendorServices=true`);
+        const r2 = await apiCall(`/api/customers?email=${encodeURIComponent(user.email)}&includeVendorServices=true`);
         const customers = await r2.json();
         
         // Expand vendor-service mappings
@@ -55,7 +56,7 @@ export default function VendorsList() {
 
   async function fetchUsageForMapping(m) {
     try {
-      const res = await fetch(`/api/vendors/${m.vendorId}/usage?subuserId=${encodeURIComponent(m.subuserId || '')}&service=${encodeURIComponent(m.service || '')}`);
+      const res = await apiCall(`/api/vendors/${m.vendorId}/usage?subuserId=${encodeURIComponent(m.subuserId || '')}&service=${encodeURIComponent(m.service || '')}`);
       const json = await res.json();
       setResults((r) => ({ ...r, [m.id || m.email]: json }));
     } catch (e) { setResults((r) => ({ ...r, [m.id || m.email]: { ok: false, error: e.message } })); }

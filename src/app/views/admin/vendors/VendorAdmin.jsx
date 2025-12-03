@@ -1,3 +1,4 @@
+import { apiCall } from "app/utils/apiConfig";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -279,7 +280,7 @@ export default function VendorAdmin() {
   async function fetchUsage(v) {
     setFetching((s) => ({ ...s, [v.id]: true }));
     try {
-      const res = await fetch(`/api/vendors/${v.id}/usage`);
+      const res = await apiCall(`/api/vendors/${v.id}/usage`);
       const json = await res.json();
       setResults((r) => ({ ...r, [v.id]: json }));
     } catch (err) {
@@ -292,7 +293,7 @@ export default function VendorAdmin() {
   async function fetchRaw(v) {
     setFetching((s) => ({ ...s, [v.id]: true }));
     try {
-      const res = await fetch(`/api/vendors/${v.id}/fetch?path=/usage`);
+      const res = await apiCall(`/api/vendors/${v.id}/fetch?path=/usage`);
       const json = await res.json();
       setResults((r) => ({ ...r, [v.id]: json }));
     } catch (err) {

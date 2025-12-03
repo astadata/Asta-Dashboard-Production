@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiCall } from "app/utils/apiConfig";
 import {
   Box,
   Card,
@@ -64,7 +65,7 @@ export default function CustomerRates() {
 
   const loadCustomers = async () => {
     try {
-      const res = await fetch("/api/customers?includeVendorServices=true");
+      const res = await apiCall("/api/customers?includeVendorServices=true");
       const data = await res.json();
       
       // Expand customers to include all their vendor-service mappings
@@ -95,7 +96,7 @@ export default function CustomerRates() {
 
   const loadRates = async () => {
     try {
-      const res = await fetch("/api/customer-rates");
+      const res = await apiCall("/api/customer-rates");
       const data = await res.json();
       setRates(data);
     } catch (err) {
@@ -165,7 +166,7 @@ export default function CustomerRates() {
     try {
       if (editingRate) {
         // Update existing rate
-        const res = await fetch(`/api/customer-rates/${editingRate.id}`, {
+        const res = await apiCall(`/api/customer-rates/${editingRate.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -181,7 +182,7 @@ export default function CustomerRates() {
         }
       } else {
         // Add new rate
-        const res = await fetch("/api/customer-rates", {
+        const res = await apiCall("/api/customer-rates", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
@@ -210,7 +211,7 @@ export default function CustomerRates() {
   const handleDelete = async (rateId) => {
     if (window.confirm("Are you sure you want to delete this rate?")) {
       try {
-        const res = await fetch(`/api/customer-rates/${rateId}`, {
+        const res = await apiCall(`/api/customer-rates/${rateId}`, {
           method: "DELETE"
         });
         

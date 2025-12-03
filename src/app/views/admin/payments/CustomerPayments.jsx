@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { apiCall } from "app/utils/apiConfig";
 import {
   Box,
   Card,
@@ -166,7 +167,7 @@ export default function CustomerPayments() {
     try {
       setLoading(true);
       // Fetch vendors
-      const vendorsRes = await fetch('/api/vendors', {
+      const vendorsRes = await apiCall('/api/vendors', {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -176,7 +177,7 @@ export default function CustomerPayments() {
       setAllVendors(vendorsData);
 
       // Fetch customers with vendor services
-      const customersRes = await fetch('/api/customers?includeVendorServices=true', {
+      const customersRes = await apiCall('/api/customers?includeVendorServices=true', {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'

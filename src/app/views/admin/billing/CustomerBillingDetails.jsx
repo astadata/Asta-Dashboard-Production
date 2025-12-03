@@ -100,7 +100,8 @@ export default function CustomerBillingDetails() {
 
   const loadCustomers = async () => {
     try {
-      const response = await fetch('http://localhost:3030/api/customers', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const response = await fetch(`${apiUrl}/api/customers`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -132,7 +133,8 @@ export default function CustomerBillingDetails() {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3030/api/billing-details?email=${encodeURIComponent(email)}`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const response = await fetch(`${apiUrl}/api/billing-details?email=${encodeURIComponent(email)}`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -208,7 +210,8 @@ export default function CustomerBillingDetails() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:3030/api/billing-details', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const response = await fetch(`${apiUrl}/api/billing-details`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

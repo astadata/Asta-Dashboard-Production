@@ -230,7 +230,8 @@ export default function CustomerPayments() {
   const loadRecords = async () => {
     setLoading(true);
     try {
-      let url = 'http://localhost:3030/api/customer-payments';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      let url = `${apiUrl}/api/customer-payments`;
       const params = new URLSearchParams();
       
       // For non-admin users, automatically filter by their email
@@ -333,9 +334,10 @@ export default function CustomerPayments() {
         return;
       }
 
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
       const url = formData.id 
-        ? `http://localhost:3030/api/customer-payments/${formData.id}` 
-        : 'http://localhost:3030/api/customer-payments';
+        ? `${apiUrl}/api/customer-payments/${formData.id}` 
+        : `${apiUrl}/api/customer-payments`;
       const method = formData.id ? 'PUT' : 'POST';
       
       // Convert empty strings to 0 for numeric fields to ensure valid data
@@ -443,7 +445,8 @@ export default function CustomerPayments() {
         }));
 
         // Send to API
-        const response = await fetch('http://localhost:3030/api/customer-payments/bulk-import', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+        const response = await fetch(`${apiUrl}/api/customer-payments/bulk-import`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(processedData)

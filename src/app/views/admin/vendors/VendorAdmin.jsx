@@ -82,7 +82,8 @@ export default function VendorAdmin() {
   async function loadVendors() {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3030/api/vendors', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const res = await fetch(`${apiUrl}/api/vendors`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -99,7 +100,8 @@ export default function VendorAdmin() {
 
   async function loadConfiguredServices() {
     try {
-      const res = await fetch('http://localhost:3030/api/services', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const res = await fetch(`${apiUrl}/api/services`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -174,11 +176,10 @@ export default function VendorAdmin() {
         defaultHeaders
       };
 
-      const url = editingVendor 
-        ? `http://localhost:3030/api/vendors/${editingVendor.id}`
-        : 'http://localhost:3030/api/vendors';
-      
-      const method = editingVendor ? 'PUT' : 'POST';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const url = editingVendor
+        ? `${apiUrl}/api/vendors/${editingVendor.id}`
+        : `${apiUrl}/api/vendors`;      const method = editingVendor ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
         method,
@@ -224,7 +225,8 @@ export default function VendorAdmin() {
       for (const serviceId of toAdd) {
         const availableService = availableServices.find(s => s.id === serviceId);
         if (availableService) {
-          await fetch(`http://localhost:3030/api/services`, {
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+          await fetch(`${apiUrl}/api/services`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -239,7 +241,8 @@ export default function VendorAdmin() {
 
       // Delete service entries that are no longer selected
       for (const service of toRemove) {
-        await fetch(`http://localhost:3030/api/services/${service.id}`, { 
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+        await fetch(`${apiUrl}/api/services/${service.id}`, { 
           method: 'DELETE' 
         });
       }
@@ -254,7 +257,8 @@ export default function VendorAdmin() {
     if (!window.confirm('Are you sure you want to delete this vendor?')) return;
 
     try {
-      const res = await fetch(`http://localhost:3030/api/vendors/${vendorId}`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const res = await fetch(`${apiUrl}/api/vendors/${vendorId}`, {
         method: 'DELETE'
       });
 

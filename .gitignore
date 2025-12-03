@@ -22,6 +22,9 @@
 .env.test.local
 .env.production.local
 
+# Allow .env.production (needed for Netlify builds)
+!.env.production
+
 # server environment variables
 server/.env
 server/.env.local

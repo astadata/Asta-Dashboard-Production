@@ -46,7 +46,7 @@ export default function Footer() {
           <FooterContent>
             <a href="https://ui-lib.com/downloads/matx-pro-react-admin/">
               <Button variant="contained" color="secondary">
-                Get MatX Pro
+                Get Astadata Pro
               </Button>
             </a>
 

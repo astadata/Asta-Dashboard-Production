@@ -1,0 +1,11 @@
+[
+  {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "email": "test.user+vendor@example.com",
+    "role": "CUSTOMER",
+    "vendorId": "vendor-dataimpulse",
+    "subuserId": "subuser-123",
+    "service": "bandwidth",
+    "password": "testpass123"
+  }
+]

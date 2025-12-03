@@ -105,33 +105,9 @@ const Layout1Topbar = () => {
     <TopbarRoot>
       <TopbarContainer>
         <Box display="flex">
-          <StyledIconButton onClick={handleSidebarToggle}>
-            <Menu />
-          </StyledIconButton>
-
-          <IconBox>
-            <StyledIconButton>
-              <MailOutline />
-            </StyledIconButton>
-
-            <StyledIconButton>
-              <WebAsset />
-            </StyledIconButton>
-
-            <StyledIconButton>
-              <StarOutline />
-            </StyledIconButton>
-          </IconBox>
         </Box>
 
         <Box display="flex" alignItems="center">
-          <MatxSearchBox />
-
-          <NotificationProvider>
-            <NotificationBar />
-          </NotificationProvider>
-
-          <ShoppingCart />
 
           <MatxMenu
             menuButton={
@@ -150,17 +126,21 @@ const Layout1Topbar = () => {
               </Link>
             </StyledItem>
 
-            <StyledItem>
-              <Link to="/page-layouts/user-profile">
-                <Person />
-                <Span sx={{ marginInlineStart: 1 }}>Profile</Span>
-              </Link>
-            </StyledItem>
+            {(user.role === 'ADMIN' || user.role === 'SA') && (
+              <>
+                <StyledItem>
+                  <Link to="/page-layouts/user-profile">
+                    <Person />
+                    <Span sx={{ marginInlineStart: 1 }}>Profile</Span>
+                  </Link>
+                </StyledItem>
 
-            <StyledItem>
-              <Settings />
-              <Span sx={{ marginInlineStart: 1 }}>Settings</Span>
-            </StyledItem>
+                <StyledItem>
+                  <Settings />
+                  <Span sx={{ marginInlineStart: 1 }}>Settings</Span>
+                </StyledItem>
+              </>
+            )}
 
             <StyledItem onClick={logout}>
               <PowerSettingsNew />

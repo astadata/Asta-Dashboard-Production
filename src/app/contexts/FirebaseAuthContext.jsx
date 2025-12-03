@@ -26,8 +26,8 @@ const initialAuthState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "FB_AUTH_STATE_CHANGED": {
-      const { isAuthenticated, user } = action.payload;
-      return { ...state, isAuthenticated, isInitialized: true, user };
+        const { isAuthenticated, user } = action.payload;
+        return { ...state, isAuthenticated, isInitialized: true, user };
     }
 
     default: {
@@ -44,7 +44,88 @@ const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialAuthState);
 
-  const signInWithEmail = (email, password) => {
+  const signInWithEmail = async (email, password) => {
+    // Development-only shortcut: allow a local seeded admin account without contacting Firebase.
+    // WARNING: This is for local development/testing only. Do NOT use in production.
+    try {
+      if (process.env.NODE_ENV !== 'production' && email === 'sales@astadata.com' && password === 'Astadata@123') {
+        const role = 'ADMIN';
+        try { localStorage.setItem('userRole', role); } catch (e) {}
+        dispatch({
+          type: 'FB_AUTH_STATE_CHANGED',
+          payload: {
+            isAuthenticated: true,
+            user: { id: 'dev-admin', email, avatar: null, name: 'Sales Admin', role }
+          }
+        });
+        return Promise.resolve();
+      }
+    } catch (e) {
+      // ignore and fallback to real auth
+    }
+
+    // Development-only: allow customers stored in server customers.json to authenticate with a dummy password
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        const res = await fetch(`/api/customers?email=${encodeURIComponent(email)}&includeVendorServices=true`);
+        if (res.ok) {
+          const list = await res.json();
+          console.log(`[Auth] Found ${list.length} customers for email:`, email);
+          
+          // Check if customer record matches the password
+          const match = (list || []).find((c) => c.password && c.password === password);
+          if (match) {
+            console.log('[Auth] Customer authenticated successfully');
+            const role = match.role || 'CUSTOMER';
+            try { localStorage.setItem('userRole', role); } catch (e) {}
+            
+            // Transform vendorServices to allMappings format for backward compatibility
+            console.log('[Auth] vendorServices:', match.vendorServices);
+            const allMappings = (match.vendorServices || []).map(vs => ({
+              id: match.id,
+              email: match.email,
+              customerName: match.customerName,
+              role: match.role,
+              vendorId: vs.vendor_id || vs.vendors?.id,
+              service: vs.services?.name || vs.serviceName,
+              subuserId: vs.subuser_id,
+              vendor: vs.vendors?.name || vs.vendorName
+            }));
+            console.log('[Auth] Transformed allMappings:', allMappings);
+            
+            dispatch({
+              type: 'FB_AUTH_STATE_CHANGED',
+              payload: {
+                isAuthenticated: true,
+                user: { 
+                  id: match.id || `dev-${email}`, 
+                  email, 
+                  avatar: null, 
+                  name: email, 
+                  customerName: match.customerName,
+                  role, 
+                  mapping: allMappings[0] || match,
+                  allMappings: allMappings  // Add all mappings for dropdown
+                }
+              }
+            });
+            console.log('[Auth] Login successful, dispatched user state');
+            return Promise.resolve();
+          } else if (list.length > 0) {
+            // Customer exists but wrong password
+            console.error('[Auth] Customer found but password mismatch');
+            throw new Error('Invalid password');
+          }
+        }
+      } catch (e) {
+        console.error('[Auth] Customer login error:', e.message);
+        if (e.message === 'Invalid password') {
+          throw e;
+        }
+        // ignore other errors and fall back to real auth
+      }
+    }
+
     return signInWithEmailAndPassword(auth, email, password);
   };
 
@@ -57,11 +138,36 @@ export const AuthProvider = ({ children }) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const logout = () => signOut(auth);
+  const logout = () => {
+    try { localStorage.removeItem('userRole'); } catch (e) {}
+    
+    // Clear the authentication state first
+    dispatch({
+      type: 'FB_AUTH_STATE_CHANGED',
+      payload: { isAuthenticated: false, user: null }
+    });
+    
+    // Then attempt Firebase sign out (will fail gracefully for dev customers)
+    return signOut(auth).catch(() => {
+      // For dev-only customers that don't have Firebase accounts, state is already cleared above
+      console.log('Firebase sign out not needed for dev customer');
+    });
+  };
+
+  const setUserRole = (role) => {
+    // save role in localStorage for demo purposes
+    try { localStorage.setItem('userRole', role); } catch (e) {}
+    // dispatch a local update so navs update immediately
+    dispatch({ type: 'FB_AUTH_STATE_CHANGED', payload: { isAuthenticated: state.isAuthenticated, user: { ...(state.user || {}), role } } });
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        const savedRole = (() => {
+          try { return localStorage.getItem('userRole') || 'GUEST'; } catch (e) { return 'GUEST'; }
+        })();
+
         dispatch({
           type: "FB_AUTH_STATE_CHANGED",
           payload: {
@@ -70,7 +176,8 @@ export const AuthProvider = ({ children }) => {
               id: user.uid,
               email: user.email,
               avatar: user.photoURL,
-              name: user.displayName || user.email
+              name: user.displayName || user.email,
+              role: savedRole
             }
           }
         });
@@ -95,7 +202,8 @@ export const AuthProvider = ({ children }) => {
         signInWithGoogle,
         method: "FIREBASE",
         signInWithEmail,
-        createUserWithEmail
+        createUserWithEmail,
+        setUserRole
       }}>
       {children}
     </AuthContext.Provider>

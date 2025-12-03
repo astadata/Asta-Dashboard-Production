@@ -70,15 +70,7 @@ const Layout1Sidenav = () => {
   return (
     <SidebarNavRoot image={bgImgURL} width={getSidenavWidth()}>
       <NavListBox>
-        <Brand>
-          <Switch
-            size="small"
-            color="secondary"
-            onChange={handleSidenavToggle}
-            checked={leftSidebar.mode !== "full"}
-            sx={{ [theme.breakpoints.down("md")]: { display: "none" } }}
-          />
-        </Brand>
+        <Brand />
         <Sidenav />
       </NavListBox>
     </SidebarNavRoot>

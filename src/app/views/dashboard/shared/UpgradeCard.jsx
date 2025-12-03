@@ -32,7 +32,7 @@ export default function UpgradeCard() {
         <img src="/assets/images/illustrations/upgrade.svg" alt="upgrade" />
 
         <Paragraph>
-          Upgrade to <b>MatX PRO</b> for <br /> more resources
+          Upgrade to <b>Astadata PRO</b> for <br /> more resources
         </Paragraph>
 
         <Button

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "vendor-dataimpulse",
+    "name": "Dataimpulse",
+    "slug": "dataimpulse",
+    "enabled": true,
+    "auth_type": "custom_token",
+    "token_endpoint": "https://api.dataimpulse.com/reseller/user/token/get",
+    "api_base_url": "https://api.dataimpulse.com",
+    "credentials": { 
+      "username": "marketplaceproxy@gmail.com", 
+      "password": "cDrdGSkCJ3JDlDxdbiMSVvF6ROKL8uZa" 
+    },
+    "default_headers": {}
+  },
+  {
+    "id": "vendor-oxylabs",
+    "name": "Oxylabs",
+    "slug": "oxylabs",
+    "enabled": true,
+    "auth_type": "api_key",
+    "api_base_url": "https://api.oxylabs.example",
+    "credentials": { "headerName": "Authorization", "apiKey": "Bearer demo-key" },
+    "default_headers": {}
+  },
+  {
+    "id": "vendor-brightdata",
+    "name": "Bright Data",
+    "slug": "brightdata",
+    "enabled": true,
+    "auth_type": "api_key",
+    "api_base_url": "https://api.brightdata.example",
+    "credentials": { "headerName": "Authorization", "apiKey": "Bearer demo-key" },
+    "default_headers": {}
+  },
+  {
+    "id": "vendor-smartproxy",
+    "name": "SmartProxy",
+    "slug": "smartproxy",
+    "enabled": true,
+    "auth_type": "api_key",
+    "api_base_url": "https://api.smartproxy.example",
+    "credentials": { "headerName": "X-API-Key", "apiKey": "demo-key" },
+    "default_headers": {}
+  },
+  {
+    "id": "vendor-soax",
+    "name": "SOAX",
+    "slug": "soax",
+    "enabled": true,
+    "auth_type": "api_key",
+    "api_base_url": "https://api.soax.example",
+    "credentials": { "headerName": "Authorization", "apiKey": "Bearer demo-key" },
+    "default_headers": {}
+  }
+]

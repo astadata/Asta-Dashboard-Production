@@ -1,0 +1,23 @@
+# Netlify configuration for React Vite app
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[dev]
+  # Optional: local netlify dev command if you use Netlify CLI
+  command = "npm run dev"
+
+# Redirect all requests to index.html for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables (you'll set these in Netlify dashboard)
+# VITE_API_URL
+# VITE_SUPABASE_URL
+# VITE_SUPABASE_KEY

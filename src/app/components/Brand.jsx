@@ -29,7 +29,7 @@ export default function Brand({ children }) {
       <Box display="flex" alignItems="center">
         <MatxLogo />
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          Matx
+          Astadata
         </StyledSpan>
       </Box>
 

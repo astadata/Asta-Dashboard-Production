@@ -6,6 +6,7 @@ import ButtonBase from "@mui/material/ButtonBase";
 import styled from "@mui/material/styles/styled";
 
 import useSettings from "app/hooks/useSettings";
+import useAuth from "app/hooks/useAuth";
 import { Paragraph, Span } from "../Typography";
 import MatxVerticalNavExpansionPanel from "./MatxVerticalNavExpansionPanel";
 
@@ -84,7 +85,14 @@ export default function MatxVerticalNav({ items }) {
   const { mode } = settings.layout1Settings.leftSidebar;
 
   const renderLevels = (data) => {
+    const { user } = useAuth();
+    const role = user?.role || 'GUEST';
+
     return data.map((item, index) => {
+      // If item has an `auth` array, show it only to matching roles
+      if (item.auth && Array.isArray(item.auth)) {
+        if (!item.auth.includes(role)) return null;
+      }
       if (item.type === "label")
         return (
           <ListLabel key={index} mode={mode} className="sidenavHoverShow">

@@ -8,6 +8,9 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 
 const root = createRoot(document.getElementById("root"));
 
+// Ensure the browser tab title is set (fallback / initial title)
+document.title = 'Astadata Dashboard';
+
 root.render(
   <StrictMode>
     <BrowserRouter>

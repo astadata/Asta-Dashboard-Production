@@ -1,13 +1,14 @@
+import { useMemo } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid2";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
-import Store from "@mui/icons-material/Store";
 import Group from "@mui/icons-material/Group";
 import AttachMoney from "@mui/icons-material/AttachMoney";
-import ShoppingCart from "@mui/icons-material/ShoppingCart";
+import Storage from "@mui/icons-material/Storage";
+import SwapCalls from "@mui/icons-material/SwapCalls";
 import ArrowRightAlt from "@mui/icons-material/ArrowRightAlt";
 import { Small } from "app/components/Typography";
 
@@ -26,37 +27,65 @@ const ContentBox = styled(Box)(({ theme }) => ({
   display: "flex",
   flexWrap: "wrap",
   alignItems: "center",
-  "& small": { color: theme.palette.text.secondary },
-  "& .icon": { opacity: 0.6, fontSize: "44px", color: theme.palette.primary.main }
+  "& small": { 
+    color: "#0d6b6b", 
+    fontSize: "13px",
+    fontWeight: "400",
+    fontFamily: "'Segoe UI', 'Helvetica Neue', sans-serif"
+  },
+  "& .icon": { opacity: 0.6, fontSize: "38px", color: theme.palette.primary.main }
 }));
 
 const Heading = styled("h6")(({ theme }) => ({
   margin: 0,
   marginTop: "4px",
-  fontSize: "14px",
+  fontSize: "13px",
   fontWeight: "500",
   color: theme.palette.primary.main
 }));
 
-export default function StatCards() {
-  const cardList = [
-    { name: "New Leads", amount: 3050, Icon: Group },
-    { name: "This week Sales", amount: "$80,500", Icon: AttachMoney },
-    { name: "Inventory Status", amount: "8.5% Stock Surplus", Icon: Store },
-    { name: "Orders to deliver", amount: "305 Orders", Icon: ShoppingCart }
-  ];
+export default function StatCards({ usageData = [], customerRate = null }) {
+  // Calculate totals from usage data (memoized for performance)
+  const totalBandwidth = useMemo(() => 
+    usageData.reduce((sum, item) => sum + (Number(item.trafficGb) || 0), 0),
+    [usageData]
+  );
+  
+  const totalRequests = useMemo(() => 
+    usageData.reduce((sum, item) => sum + (Number(item.requests) || 0), 0).toLocaleString(),
+    [usageData]
+  );
+  
+  // Calculate total spend: rate per GB * total bandwidth (memoized)
+  const totalSpend = useMemo(() => 
+    customerRate && customerRate.ratePerGb 
+      ? (totalBandwidth * Number(customerRate.ratePerGb)).toFixed(2)
+      : "0.00",
+    [customerRate, totalBandwidth]
+  );
+  
+  // Memoize card list to prevent recreation on every render
+  const cardList = useMemo(() => [
+    { name: "Total Bandwidth Usage", amount: `${totalBandwidth.toFixed(2)} GB`, Icon: Storage },
+    { name: "Total Requests", amount: totalRequests, Icon: SwapCalls },
+    { name: "Total Spend", amount: `$${totalSpend}`, Icon: AttachMoney }
+  ], [totalBandwidth, totalRequests, totalSpend]);
 
   return (
     <Grid container spacing={3} sx={{ mb: "24px" }}>
-      {cardList.map(({ amount, Icon, name }) => (
-        <Grid size={{ md: 6, xs: 12 }} key={name}>
+      {cardList.map(({ amount, Icon, name, color }) => (
+        <Grid size={{ md: 4, xs: 12 }} key={name}>
           <StyledCard elevation={6}>
             <ContentBox>
-              <Icon className="icon" />
+              {name === "Wallet Balance" ? (
+                <Box className="icon" sx={{ color: "#FFC107", fontSize: "44px" }}>$$</Box>
+              ) : (
+                <Icon className="icon" sx={color ? { color: color } : {}} />
+              )}
 
               <Box ml="12px">
                 <Small>{name}</Small>
-                <Heading>{amount}</Heading>
+                <Heading style={color ? { color: color } : name === "Wallet Balance" ? { color: "#FFC107" } : {}}>{amount}</Heading>
               </Box>
             </ContentBox>
 

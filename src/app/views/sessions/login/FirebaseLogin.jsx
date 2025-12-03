@@ -99,7 +99,7 @@ export default function FirebaseLogin() {
     try {
       // alert(JSON.stringify(values, null, 4));
       await signInWithEmail(values.email, values.password);
-      navigate(state ? state.from : "/");
+      navigate(state ? state.from : "/dashboard/default");
       enqueueSnackbar("Logged In Successfully", { variant: "success" });
     } catch (error) {
       alert(JSON.stringify(error, null, 4));
@@ -110,7 +110,7 @@ export default function FirebaseLogin() {
   const handleGoogleLogin = async () => {
     try {
       await signInWithGoogle();
-      navigate("/");
+      navigate("/dashboard/default");
     } catch (e) {
       console.error(e);
     }
@@ -123,7 +123,7 @@ export default function FirebaseLogin() {
           <Grid size={{ md: 6, xs: 12 }}>
             <div className="cardLeft">
               <Logo>
-                <MatxLogo /> <span>MatX Pro</span>
+                <MatxLogo /> <span>Astadata Pro</span>
               </Logo>
 
               <h1 className="mainTitle">Admin Dashboard</h1>

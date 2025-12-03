@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     // Development-only shortcut: allow a local seeded admin account without contacting Firebase.
     // WARNING: This is for local development/testing only. Do NOT use in production.
     try {
-      if (process.env.NODE_ENV !== 'production' && email === 'sales@astadata.com' && password === 'Astadata@123') {
+      if (email === 'sales@astadata.com' && password === 'Astadata@123') {
         const role = 'ADMIN';
         try { localStorage.setItem('userRole', role); } catch (e) {}
         dispatch({
@@ -64,10 +64,10 @@ export const AuthProvider = ({ children }) => {
       // ignore and fallback to real auth
     }
 
-    // Development-only: allow customers stored in server customers.json to authenticate with a dummy password
-    if (process.env.NODE_ENV !== 'production') {
-      try {
-        const res = await fetch(`/api/customers?email=${encodeURIComponent(email)}&includeVendorServices=true`);
+    // Allow customers stored in database to authenticate
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3030';
+      const res = await fetch(`${apiUrl}/api/customers?email=${encodeURIComponent(email)}&includeVendorServices=true`);
         if (res.ok) {
           const list = await res.json();
           console.log(`[Auth] Found ${list.length} customers for email:`, email);

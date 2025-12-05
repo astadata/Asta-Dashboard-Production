@@ -12,7 +12,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Expose port
-EXPOSE 3030
+EXPOSE 8080
 
 # Start the server
 CMD ["node", "src/index.js"]

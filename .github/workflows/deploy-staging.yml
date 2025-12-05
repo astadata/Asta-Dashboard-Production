@@ -10,8 +10,37 @@ env:
   REGION: us-central1
 
 jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    outputs:
+      backend_url: ${{ steps.deploy-backend.outputs.url }}
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Deploy backend to staging
+        id: deploy-backend
+        run: |
+          URL=$(gcloud run deploy asta-backend-staging \
+            --source server \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --set-env-vars "SUPABASE_URL=${{ secrets.SUPABASE_URL }},SUPABASE_KEY=${{ secrets.SUPABASE_KEY }},SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            --quiet \
+            --format='value(status.url)')
+          echo "url=${URL}" >> $GITHUB_OUTPUT
+          echo "Backend deployed at: ${URL}"
+
   deploy-frontend:
     runs-on: ubuntu-latest
+    needs: deploy-backend
     steps:
       - uses: actions/checkout@v3
       
@@ -30,26 +59,4 @@ jobs:
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --platform managed \
-            --set-env-vars "VITE_API_URL=https://asta-backend-staging-533746513056.us-central1.run.app,VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }},VITE_SUPABASE_KEY=${{ secrets.SUPABASE_KEY }},VITE_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }},VITE_FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }},VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}"
-
-  deploy-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-      
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-      
-      - name: Deploy backend to staging
-        run: |
-          cd server
-          gcloud run deploy asta-backend-staging \
-            --source . \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --set-env-vars "SUPABASE_URL=${{ secrets.SUPABASE_URL }},SUPABASE_KEY=${{ secrets.SUPABASE_KEY }},SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+            --set-env-vars "VITE_API_URL=${{ needs.deploy-backend.outputs.backend_url }},VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }},VITE_SUPABASE_KEY=${{ secrets.SUPABASE_KEY }},VITE_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }},VITE_FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }},VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}"

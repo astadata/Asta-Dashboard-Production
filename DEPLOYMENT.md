@@ -59,7 +59,7 @@ Netlify should auto-detect your settings from `netlify.toml`, but verify:
 
 ---
 
-## STEP 3: Backend Deployment Options
+## STEP 3: Backend Deployment Optionsoption
 
 Your Node.js backend (in `/server`) needs separate hosting. Choose one:
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { apiCall } from "app/utils/apiConfig";
 import { useNavigate } from 'react-router-dom';
-import { apiCall } from "app/utils/apiConfig";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';

@@ -70,17 +70,14 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch(`${apiUrl}/api/customers?email=${encodeURIComponent(email)}&includeVendorServices=true`);
       if (res.ok) {
         const list = await res.json();
-        console.log(`[Auth] Found ${list.length} customers for email:`, email);
         
         // Check if customer record matches the password
         const match = (list || []).find((c) => c.password && c.password === password);
         if (match) {
-          console.log('[Auth] Customer authenticated successfully');
           const role = match.role || 'CUSTOMER';
           try { localStorage.setItem('userRole', role); } catch (e) {}
           
           // Transform vendorServices to allMappings format for backward compatibility
-          console.log('[Auth] vendorServices:', match.vendorServices);
           const allMappings = (match.vendorServices || []).map(vs => ({
             id: match.id,
             email: match.email,
@@ -91,7 +88,6 @@ export const AuthProvider = ({ children }) => {
             subuserId: vs.subuser_id,
             vendor: vs.vendors?.name || vs.vendorName
           }));
-          console.log('[Auth] Transformed allMappings:', allMappings);
           
           dispatch({
             type: 'FB_AUTH_STATE_CHANGED',
@@ -109,20 +105,22 @@ export const AuthProvider = ({ children }) => {
               }
             }
           });
-          console.log('[Auth] Login successful, dispatched user state');
           return Promise.resolve();
         } else if (list.length > 0) {
           // Customer exists but wrong password
-          console.error('[Auth] Customer found but password mismatch');
-          throw new Error('Invalid password');
+          throw new Error('Incorrect email or password. Please try again.');
+        } else {
+          // No customer found with this email
+          throw new Error('Account not found. Please check your email or contact support.');
         }
       }
     } catch (e) {
-      console.error('[Auth] Customer login error:', e.message);
-      if (e.message === 'Invalid password') {
+      // Re-throw user-friendly errors
+      if (e.message.includes('Incorrect email') || e.message.includes('Account not found')) {
         throw e;
       }
-      // ignore other errors and fall back to real auth
+      // For other errors, show generic message
+      throw new Error('Unable to sign in. Please check your credentials and try again.');
     }
 
     return signInWithEmailAndPassword(auth, email, password);
@@ -149,7 +147,6 @@ export const AuthProvider = ({ children }) => {
     // Then attempt Firebase sign out (will fail gracefully for dev customers)
     return signOut(auth).catch(() => {
       // For dev-only customers that don't have Firebase accounts, state is already cleared above
-      console.log('Firebase sign out not needed for dev customer');
     });
   };
 

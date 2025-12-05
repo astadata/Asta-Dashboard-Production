@@ -110,7 +110,7 @@ export default function Analytics() {
         const data = await res.json();
         setVendorsList(data);
       } catch (err) {
-        console.error('Error loading vendors:', err);
+        // Silently fail - vendors list will remain empty
       }
     }
     loadVendors();
@@ -146,7 +146,7 @@ export default function Analytics() {
           setSelectedCustomer(customersWithMappings[0].email);
         }
       } catch (err) {
-        console.error('Error loading customers:', err);
+        // Silently fail - customers list will remain empty
       }
     }
     loadAllCustomers();
@@ -237,7 +237,7 @@ export default function Analytics() {
           setCustomerRate(null);
         }
       } catch (err) {
-        console.error('Error loading customer rate:', err);
+        // Silently fail - rate will remain null
         setCustomerRate(null);
       }
     }
@@ -260,7 +260,7 @@ export default function Analytics() {
 
       try {
         // Fetch subuser list from DataImpulse
-        const res = await fetch(
+        const res = await apiCall(
           `/api/vendors/${currentMapping.vendorId}/fetch?path=/reseller/sub-user/list&limit=100&offset=0`
         );
         
@@ -285,8 +285,8 @@ export default function Analytics() {
           setDataBalance('Not available');
         }
       } catch (err) {
-        console.error('Error loading data balance:', err);
-        setDataBalance('Error');
+        // Silently fail - show not available
+        setDataBalance('Not available');
       }
     }
     loadDataBalance();
@@ -304,7 +304,7 @@ export default function Analytics() {
     setLoading(true);
     setApiError(null);
     try {
-      const res = await fetch(
+      const res = await apiCall(
         `/api/vendors/${currentMapping.vendorId}/usage?subuserId=${currentMapping.subuserId}&period=${period}&service=${encodeURIComponent(currentMapping.service || 'N/A')}`
       );
       
@@ -330,13 +330,13 @@ export default function Analytics() {
         const errorData = await res.json().catch(() => ({}));
         setUsageData([]);
         setHasApiSupport(false);
-        setApiError(errorData.error || 'Failed to fetch usage data');
+        setApiError(errorData.error || 'Unable to load data');
       }
     } catch (err) {
-      console.error('Error loading usage data:', err);
+      // Show user-friendly error
       setUsageData([]);
       setHasApiSupport(false);
-      setApiError('Connection error: ' + err.message);
+      setApiError('Unable to connect. Please check your internet connection.');
     } finally {
       setLoading(false);
     }

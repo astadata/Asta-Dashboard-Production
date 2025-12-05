@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiCall } from "app/utils/apiConfig";
 import Card from "@mui/material/Card";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -42,7 +43,7 @@ export default function ErrorDetailsTable({ subuserId, vendorId, period = "month
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
+        const res = await apiCall(
           `/api/vendors/${vendorId}/fetch?path=/reseller/sub-user/usage-stat/errors&subuser_id=${subuserId}&period=${period}&limit=50&offset=0&datetime_aggregate=day`
         );
         

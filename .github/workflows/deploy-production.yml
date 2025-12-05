@@ -52,4 +52,4 @@ jobs:
             --source . \
             --region ${{ env.REGION }} \
             --platform managed \
-            --set-env-vars "SUPABASE_URL=${{ secrets.PRODUCTION_SUPABASE_URL }},SUPABASE_KEY=${{ secrets.PRODUCTION_SUPABASE_KEY }},SUPABASE_SERVICE_ROLE_KEY=${{ secrets.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY }}"
+            --set-env-vars "SUPABASE_URL=${{ secrets.SUPABASE_URL }},SUPABASE_KEY=${{ secrets.SUPABASE_KEY }},SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"

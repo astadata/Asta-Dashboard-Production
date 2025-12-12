@@ -22,6 +22,8 @@ const CustomerBillingDetails = Loadable(lazy(() => import("app/views/admin/billi
 // PUBLIC/CUSTOMER VENDORS
 const VendorsList = Loadable(lazy(() => import("app/views/vendors/VendorsList")));
 const ServicesList = Loadable(lazy(() => import("app/views/vendors/ServicesList")));
+// SUPPORT
+const ChatSupport = Loadable(lazy(() => import("app/views/support/ChatSupport")));
 
 const routes = [
   { path: "/", element: <Navigate to="dashboard/default" /> },
@@ -44,6 +46,8 @@ const routes = [
       // public/customer routes
       { path: "/vendors", element: <VendorsList />, auth: authRoles.guest },
       { path: "/services", element: <ServicesList />, auth: authRoles.guest },
+      // support routes
+      { path: "/support/chat", element: <ChatSupport />, auth: authRoles.guest },
       // e-chart route
       { path: "/charts/echarts", element: <AppEchart />, auth: authRoles.editor }
     ]

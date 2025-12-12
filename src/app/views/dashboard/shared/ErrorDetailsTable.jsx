@@ -11,6 +11,10 @@ import Button from "@mui/material/Button";
 import TableContainer from "@mui/material/TableContainer";
 import CircularProgress from "@mui/material/CircularProgress";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 import { styled } from "@mui/material/styles";
 
 const H4 = styled("h4")(({ theme }) => ({
@@ -30,9 +34,10 @@ const CardRoot = styled(Card)(({ theme }) => ({
   }
 }));
 
-export default function ErrorDetailsTable({ subuserId, vendorId, period = "month" }) {
+export default function ErrorDetailsTable({ subuserId, vendorId, period: initialPeriod = "month" }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod);
 
   useEffect(() => {
     if (!subuserId || !vendorId) {
@@ -44,7 +49,7 @@ export default function ErrorDetailsTable({ subuserId, vendorId, period = "month
       setLoading(true);
       try {
         const res = await apiCall(
-          `/api/vendors/${vendorId}/fetch?path=/reseller/sub-user/usage-stat/errors&subuser_id=${subuserId}&period=${period}&limit=50&offset=0&datetime_aggregate=day`
+          `/api/vendors/${vendorId}/fetch?path=/reseller/sub-user/usage-stat/errors&subuser_id=${subuserId}&period=${selectedPeriod}&limit=50&offset=0&datetime_aggregate=day`
         );
         
         if (res.ok) {
@@ -82,7 +87,7 @@ export default function ErrorDetailsTable({ subuserId, vendorId, period = "month
     };
 
     fetchData();
-  }, [subuserId, vendorId, period]);
+  }, [subuserId, vendorId, selectedPeriod]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
@@ -140,16 +145,31 @@ export default function ErrorDetailsTable({ subuserId, vendorId, period = "month
     <CardRoot elevation={6}>
       <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
         <H4>Error Details</H4>
-        <Button
-          variant="contained"
-          size="small"
-          startIcon={<FileDownloadIcon />}
-          onClick={exportToCSV}
-          disabled={!data.length}
-          sx={{ textTransform: "none" }}
-        >
-          Export to CSV
-        </Button>
+        <Box display="flex" gap={2} alignItems="center">
+          <FormControl size="small" sx={{ minWidth: 140 }}>
+            <InputLabel>Period</InputLabel>
+            <Select
+              value={selectedPeriod}
+              label="Period"
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+            >
+              <MenuItem value="day">Day</MenuItem>
+              <MenuItem value="week">Week</MenuItem>
+              <MenuItem value="month">Month</MenuItem>
+              <MenuItem value="3months">3 Months</MenuItem>
+              <MenuItem value="6months">6 Months</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadIcon />}
+            onClick={exportToCSV}
+            disabled={!data.length}
+          >
+            Export to CSV
+          </Button>
+        </Box>
       </Box>
 
       {loading ? (

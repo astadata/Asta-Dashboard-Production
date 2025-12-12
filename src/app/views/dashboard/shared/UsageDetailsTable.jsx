@@ -14,6 +14,12 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 import { styled } from "@mui/material/styles";
 
 const H4 = styled("h4")(({ theme }) => ({
@@ -33,11 +39,13 @@ const CardRoot = styled(Card)(({ theme }) => ({
   }
 }));
 
-export default function UsageDetailsTable({ subuserId, vendorId, period = "month" }) {
+export default function UsageDetailsTable({ subuserId, vendorId, period: initialPeriod = "month" }) {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showErrors, setShowErrors] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod);
 
   useEffect(() => {
     if (!subuserId || !vendorId) {
@@ -49,21 +57,27 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
       setLoading(true);
       try {
         const res = await apiCall(
-          `/api/vendors/${vendorId}/fetch?path=/reseller/sub-user/usage-stat/detail&subuser_id=${subuserId}&period=${period}&limit=50&offset=0`
+          `/api/vendors/${vendorId}/fetch?path=/reseller/sub-user/usage-stat/detail&subuser_id=${subuserId}&period=${selectedPeriod}&limit=100&offset=0&datetime_aggregate=hour`
         );
         
         if (res.ok) {
           const result = await res.json();
+          console.log('[UsageDetailsTable] API Response:', result);
           let usageData = [];
           
           if (result.ok && result.data) {
-            // Handle different response structures
-            if (Array.isArray(result.data)) {
-              usageData = result.data;
-            } else if (result.data.usage && Array.isArray(result.data.usage)) {
+            // Handle DataImpulse response structure: data.usage array
+            if (result.data.usage && Array.isArray(result.data.usage)) {
               usageData = result.data.usage;
+            } else if (Array.isArray(result.data)) {
+              usageData = result.data;
             } else if (result.data.details && Array.isArray(result.data.details)) {
               usageData = result.data.details;
+            }
+            
+            console.log('[UsageDetailsTable] Parsed usage data count:', usageData.length);
+            if (usageData.length > 0) {
+              console.log('[UsageDetailsTable] Sample record:', usageData[0]);
             }
             
             // Sort by date descending
@@ -75,6 +89,7 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
             setData(sortedData);
             setFilteredData(sortedData);
           } else {
+            console.log('[UsageDetailsTable] No data in response');
             setData([]);
             setFilteredData([]);
           }
@@ -92,18 +107,25 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
     };
 
     fetchData();
-  }, [subuserId, vendorId, period]);
+  }, [subuserId, vendorId, selectedPeriod]);
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredData(data);
-    } else {
-      const filtered = data.filter(item => 
+    let filtered = data;
+    
+    // Filter by status (show/hide errors)
+    if (!showErrors) {
+      filtered = filtered.filter(item => item.status === "success");
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(item => 
         (item.host || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredData(filtered);
     }
-  }, [searchQuery, data]);
+    
+    setFilteredData(filtered);
+  }, [searchQuery, data, showErrors]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
@@ -126,11 +148,17 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
   };
 
   const formatTraffic = (traffic) => {
-    // Traffic can be a string like "11.85 KB" or a number in MB
+    // Traffic can be a string like "11.85 KB" or a number in MB or GB
     if (typeof traffic === 'string') {
       return traffic; // Already formatted
     }
-    const gb = (Number(traffic || 0) / 1000).toFixed(2);
+    const num = Number(traffic || 0);
+    // If the number is less than 1000, assume it's already in GB (from trafficGb field)
+    // Otherwise, assume it's in MB and convert to GB
+    if (num < 1000) {
+      return `${num.toFixed(2)} GB`;
+    }
+    const gb = (num / 1000).toFixed(2);
     return `${gb} GB`;
   };
 
@@ -145,7 +173,7 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
     const rows = filteredData.map(item => [
       formatDate(item.datetime || item.d_usage),
       item.host || "N/A",
-      formatTraffic(item.traffic),
+      item.traffic || "0 bytes",
       item.requests || item.request || 0,
       item.status || "N/A"
     ]);
@@ -168,33 +196,60 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
 
   return (
     <CardRoot elevation={6}>
-      <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
-        <H4>Usage Details</H4>
-        <Box display="flex" gap={2} alignItems="center">
-          <TextField
-            size="small"
-            placeholder="Search by Host"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              )
-            }}
-            sx={{ width: "250px" }}
-          />
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<FileDownloadIcon />}
-            onClick={exportToCSV}
-            disabled={!filteredData.length}
-            sx={{ textTransform: "none" }}
-          >
-            Export to CSV
-          </Button>
+      <Box mb={2}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <H4>Usage Details</H4>
+          <Box display="flex" gap={2} alignItems="center">
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+              <InputLabel>Period</InputLabel>
+              <Select
+                value={selectedPeriod}
+                label="Period"
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+              >
+                <MenuItem value="day">Day</MenuItem>
+                <MenuItem value="week">Week</MenuItem>
+                <MenuItem value="month">Month</MenuItem>
+                <MenuItem value="3months">3 Months</MenuItem>
+                <MenuItem value="6months">6 Months</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showErrors}
+                  onChange={(e) => setShowErrors(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Show Errors"
+              sx={{ mr: 1 }}
+            />
+            <TextField
+              size="small"
+              placeholder="Search by Host"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                )
+              }}
+              sx={{ width: "250px" }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={exportToCSV}
+              disabled={!filteredData.length}
+              sx={{ textTransform: "none" }}
+            >
+              Export to CSV
+            </Button>
+          </Box>
         </Box>
       </Box>
 
@@ -225,7 +280,7 @@ export default function UsageDetailsTable({ subuserId, vendorId, period = "month
                   <TableRow key={index}>
                     <TableCell>{formatDate(item.datetime || item.d_usage)}</TableCell>
                     <TableCell>{item.host || "N/A"}</TableCell>
-                    <TableCell align="right">{formatTraffic(item.traffic)}</TableCell>
+                    <TableCell align="right">{item.traffic || "0 bytes"}</TableCell>
                     <TableCell align="right">{formatNumber(item.requests || item.request)}</TableCell>
                     <TableCell>{item.status || "N/A"}</TableCell>
                   </TableRow>

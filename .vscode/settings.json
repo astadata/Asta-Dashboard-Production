@@ -2,5 +2,17 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "prettier.printWidth": 100,
-  "prettier.trailingComma": "none"
+  "prettier.trailingComma": "none",
+  "editor.formatOnPaste": true,
+  "editor.wordWrap": "on",
+  "editor.aiStats.enabled": true,
+  "editor.allowVariableFontsInAccessibilityMode": false,
+  "editor.autoIndentOnPaste": true,
+  "github.copilot.chat.tools.memory.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.chat.editor.temporalContext.enabled": true,
+  "github.copilot.chat.edits.temporalContext.enabled": true,
+  "github.copilot.chat.notebook.followCellExecution.enabled": true,
+  "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+  "github.copilot.chat.newWorkspace.useContext7": true
 }

@@ -5,7 +5,7 @@ import layout1Settings from "./Layout1/Layout1Settings";
 // DOC http://demos.ui-lib.com/matx-react-doc/layout.html
 export const MatxLayoutSettings = {
   activeLayout: "layout1", // layout1, layout2
-  activeTheme: "blue", // View all valid theme colors inside MatxTheme/themeColors.js
+  activeTheme: "cyberNeon", // View all valid theme colors inside MatxTheme/themeColors.js
   perfectScrollbar: false,
 
   themes: themes,
@@ -14,13 +14,13 @@ export const MatxLayoutSettings = {
   secondarySidebar: {
     show: false,
     open: false,
-    theme: "slateDark1" // View all valid theme colors inside MatxTheme/themeColors.js
+    theme: "cyberNeon" // View all valid theme colors inside MatxTheme/themeColors.js
   },
 
   // Footer options
   footer: {
     show: false,
     fixed: false,
-    theme: "slateDark1" // View all valid theme colors inside MatxTheme/themeColors.js
+    theme: "cyberNeon" // View all valid theme colors inside MatxTheme/themeColors.js
   }
 };

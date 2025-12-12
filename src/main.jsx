@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./app/App";
 // THIRD PARTY CSS
 import "perfect-scrollbar/css/perfect-scrollbar.css";
+// FUTURISTIC THEME CSS
+import "./futuristic-theme.css";
 
 const root = createRoot(document.getElementById("root"));
 

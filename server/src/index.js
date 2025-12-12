@@ -102,6 +102,10 @@ async function main() {
   const customerVendorServicesRouter = require('./routes/customerVendorServices');
   app.use('/api/customer-vendor-services', customerVendorServicesRouter);
 
+  // support tickets routes
+  const supportTicketsRouter = require('./routes/supportTickets');
+  app.use('/api/support-tickets', supportTicketsRouter);
+
   // Add error handling middleware AFTER routes
   app.use((err, req, res, next) => {
     console.error('Express error:', err.message);

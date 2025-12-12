@@ -224,6 +224,88 @@ export const themeColors = {
       text: textDark,
     },
   },
+  cyberNeon: {
+    palette: {
+      type: 'light',
+      primary: {
+        main: '#5d87ff',
+        light: '#7ba0ff',
+        dark: '#4570ea',
+        contrastText: '#ffffff',
+      },
+      secondary: {
+        main: '#49bfaa',
+        light: '#66ccbb',
+        dark: '#3aa699',
+        contrastText: '#ffffff',
+      },
+      error: {
+        main: '#fa5c7c',
+        light: '#fb7d95',
+        dark: '#f94563',
+      },
+      warning: {
+        main: '#ffb400',
+        light: '#ffc633',
+        dark: '#e6a200',
+      },
+      info: {
+        main: '#539bff',
+        light: '#75afff',
+        dark: '#4286e6',
+      },
+      success: {
+        main: '#13deb9',
+        light: '#42e5c7',
+        dark: '#11c7a5',
+      },
+      background: {
+        paper: '#ffffff',
+        default: '#f5f5f5',
+      },
+      text: {
+        primary: '#2a3547',
+        secondary: '#5a6a85',
+        disabled: '#a8b2c1',
+      },
+    },
+  },
+  aiDark: {
+    palette: {
+      type: 'dark',
+      primary: {
+        main: '#0d1117',
+        contrastText: '#58a6ff',
+      },
+      secondary: {
+        main: '#58a6ff',
+        dark: '#1f6feb',
+        light: '#79c0ff',
+        contrastText: '#0d1117',
+      },
+      error: {
+        main: '#f85149',
+      },
+      warning: {
+        main: '#d29922',
+      },
+      info: {
+        main: '#79c0ff',
+      },
+      success: {
+        main: '#56d364',
+      },
+      background: {
+        paper: '#161b22',
+        default: '#0d1117',
+      },
+      text: {
+        primary: '#c9d1d9',
+        secondary: '#8b949e',
+        disabled: '#484f58',
+      },
+    },
+  },
 };
 
 export const themeShadows = [

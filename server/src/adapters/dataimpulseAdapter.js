@@ -159,6 +159,158 @@ class DataimpulseAdapter extends VendorAdapter {
 
     return resp.data;
   }
+
+  // Override fetchData to handle specific DataImpulse API paths
+  async fetchData(path = "/", params = {}) {
+    console.log('[DataImpulse] fetchData called with path:', path);
+    console.log('[DataImpulse] fetchData params:', params);
+
+    // Handle usage details endpoint
+    if (path === '/reseller/sub-user/usage-stat/detail') {
+      return await this.fetchUsageDetails(params);
+    }
+
+    // Handle error details endpoint
+    if (path === '/reseller/sub-user/usage-stat/errors') {
+      return await this.fetchErrorDetails(params);
+    }
+
+    // Handle standard usage endpoint
+    if (path === '/reseller/sub-user/usage-stat/get') {
+      return await this.fetchUsage(params);
+    }
+
+    // For other paths, use default behavior
+    const headers = await this.getAuthHeaders();
+    const resp = await this.http.get(path, { 
+      headers: { ...this.config.default_headers, ...headers }, 
+      params 
+    });
+    return resp.data;
+  }
+
+  // Fetch detailed usage data (host-level details)
+  async fetchUsageDetails(params = {}) {
+    const { subuser_id, period = 'month', limit = 50, offset = 0 } = params;
+    
+    if (!subuser_id) {
+      console.log('[DataImpulse] No subuser_id provided for usage details');
+      return [];
+    }
+
+    console.log(`[DataImpulse] Fetching usage details for subuser ${subuser_id}, period: ${period}`);
+
+    const path = '/reseller/sub-user/usage-stat/detail';
+    const queryParams = {
+      subuser_id,
+      period,
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    };
+
+    try {
+      const headers = await this.getAuthHeaders();
+      console.log('[DataImpulse] Calling details API:', this.config.api_base_url + path);
+      console.log('[DataImpulse] Query params:', queryParams);
+      
+      const resp = await this.http.get(path, { 
+        headers: { ...this.config.default_headers, ...headers }, 
+        params: queryParams,
+        timeout: 15000
+      });
+
+      console.log('[DataImpulse] Details response status:', resp.status);
+      console.log('[DataImpulse] Details response data structure:', Object.keys(resp.data));
+      console.log('[DataImpulse] Full response data:', JSON.stringify(resp.data).substring(0, 500));
+      
+      // Return the data in expected format
+      let details = [];
+      if (resp.data && Array.isArray(resp.data)) {
+        details = resp.data;
+      } else if (resp.data && resp.data.usage && Array.isArray(resp.data.usage)) {
+        details = resp.data.usage;
+      } else if (resp.data && resp.data.data && Array.isArray(resp.data.data)) {
+        details = resp.data.data;
+      } else if (resp.data && resp.data.details && Array.isArray(resp.data.details)) {
+        details = resp.data.details;
+      }
+
+      console.log('[DataImpulse] Found', details.length, 'detail records');
+      if (details.length > 0) {
+        console.log('[DataImpulse] Sample detail record fields:', Object.keys(details[0]));
+        console.log('[DataImpulse] Sample detail record:', JSON.stringify(details[0]));
+        console.log('[DataImpulse] Second record:', JSON.stringify(details[1] || 'N/A'));
+      }
+      return details;
+    } catch (err) {
+      console.error('[DataImpulse] Usage details fetch error:', err.message);
+      if (err.response) {
+        console.error('[DataImpulse] Response status:', err.response.status);
+        console.error('[DataImpulse] Response data:', JSON.stringify(err.response.data));
+      }
+      // Return empty array instead of throwing to prevent table from breaking
+      return [];
+    }
+  }
+
+  // Fetch error details
+  async fetchErrorDetails(params = {}) {
+    const { subuser_id, period = 'month', limit = 50, offset = 0, datetime_aggregate = 'day' } = params;
+    
+    if (!subuser_id) {
+      console.log('[DataImpulse] No subuser_id provided for error details');
+      return [];
+    }
+
+    console.log(`[DataImpulse] Fetching error details for subuser ${subuser_id}, period: ${period}`);
+
+    const path = '/reseller/sub-user/usage-stat/errors';
+    const queryParams = {
+      subuser_id,
+      period,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      datetime_aggregate
+    };
+
+    try {
+      const headers = await this.getAuthHeaders();
+      console.log('[DataImpulse] Calling errors API:', this.config.api_base_url + path);
+      console.log('[DataImpulse] Query params:', queryParams);
+      
+      const resp = await this.http.get(path, { 
+        headers: { ...this.config.default_headers, ...headers }, 
+        params: queryParams,
+        timeout: 15000
+      });
+
+      console.log('[DataImpulse] Errors response status:', resp.status);
+      console.log('[DataImpulse] Errors response data structure:', Object.keys(resp.data));
+      
+      // Return the data in expected format
+      let errors = [];
+      if (resp.data && Array.isArray(resp.data)) {
+        errors = resp.data;
+      } else if (resp.data && resp.data.errors && Array.isArray(resp.data.errors)) {
+        errors = resp.data.errors;
+      } else if (resp.data && resp.data.data && Array.isArray(resp.data.data)) {
+        errors = resp.data.data;
+      } else if (resp.data && resp.data.usage && Array.isArray(resp.data.usage)) {
+        errors = resp.data.usage;
+      }
+
+      console.log('[DataImpulse] Found', errors.length, 'error records');
+      return errors;
+    } catch (err) {
+      console.error('[DataImpulse] Error details fetch error:', err.message);
+      if (err.response) {
+        console.error('[DataImpulse] Response status:', err.response.status);
+        console.error('[DataImpulse] Response data:', JSON.stringify(err.response.data));
+      }
+      // Return empty array instead of throwing to prevent table from breaking
+      return [];
+    }
+  }
 }
 
 module.exports = DataimpulseAdapter;

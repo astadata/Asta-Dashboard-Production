@@ -29,6 +29,11 @@ const navigations = [
     icon: "widgets",
     path: "/services"
   },
+  {
+    name: "Chat Support",
+    icon: "support_agent",
+    path: "/support/chat"
+  },
 
   { label: "ASTADATA ADMIN", type: "label", auth: ["SA", "ADMIN"] },
 

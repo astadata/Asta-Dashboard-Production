@@ -29,7 +29,7 @@ import {
   TableContainer,
   Paper
 } from '@mui/material';
-import { Breadcrumb, SimpleCard } from 'app/components';
+import { SimpleCard } from 'app/components';
 import useAuth from 'app/hooks/useAuth';
 import * as XLSX from 'xlsx';
 
@@ -616,13 +616,6 @@ export default function CustomerPayments() {
 
   return (
     <Container>
-      <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[
-          { name: isAdmin ? 'Admin' : 'Home', path: isAdmin ? '/admin' : '/dashboard' }, 
-          { name: 'Payment/Invoice Details' }
-        ]} />
-      </Box>
-
       {message.text && (
         <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage({ type: '', text: '' })}>
           {message.text}

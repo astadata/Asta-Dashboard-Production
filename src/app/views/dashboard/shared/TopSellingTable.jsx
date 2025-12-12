@@ -121,7 +121,7 @@ export default function TopSellingTable({ usageData = usageList }) {
       <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
         <H4>Usage Summary</H4>
         <Button
-          variant="contained"
+          variant="outlined"
           size="small"
           startIcon={<FileDownloadIcon />}
           onClick={exportToCSV}

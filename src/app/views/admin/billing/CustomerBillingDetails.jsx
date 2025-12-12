@@ -17,7 +17,7 @@ import {
   DialogContent,
   DialogActions
 } from '@mui/material';
-import { Breadcrumb, SimpleCard } from 'app/components';
+import { SimpleCard } from 'app/components';
 import useAuth from 'app/hooks/useAuth';
 import BusinessIcon from '@mui/icons-material/Business';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -258,15 +258,6 @@ export default function CustomerBillingDetails() {
 
   return (
     <Container>
-      <Box className="breadcrumb">
-        <Breadcrumb 
-          routeSegments={[
-            { name: isAdmin ? 'Admin' : 'Home', path: isAdmin ? '/admin' : '/dashboard' }, 
-            { name: 'Billing Details' }
-          ]} 
-        />
-      </Box>
-
       {message.text && (
         <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage({ type: '', text: '' })}>
           {message.text}

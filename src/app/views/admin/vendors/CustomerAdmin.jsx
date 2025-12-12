@@ -492,8 +492,17 @@ export default function CustomerAdmin() {
                         <TableCell>{c.subuserId}</TableCell>
                         <TableCell>{c.service}</TableCell>
                         <TableCell>
-                          <Button size="small" sx={{ mr: 1 }} onClick={() => startEdit(c)}>Edit</Button>
-                          <Button size="small" color="error" onClick={() => deleteCustomer(c.mappingId)}>Delete</Button>
+                          {c.mappingId && /^[0-9a-fA-F-]{36}$/.test(c.mappingId) ? (
+                            <>
+                              <Button size="small" sx={{ mr: 1 }} onClick={() => startEdit(c)}>Edit</Button>
+                              <Button size="small" color="error" onClick={() => deleteCustomer(c.mappingId)}>Delete</Button>
+                            </>
+                          ) : (
+                            <span title="Cannot edit/delete: Mapping does not have a valid ID. Please remove and re-add this mapping.">
+                              <Button size="small" sx={{ mr: 1 }} disabled>Edit</Button>
+                              <Button size="small" color="error" disabled>Delete</Button>
+                            </span>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

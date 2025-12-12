@@ -53,6 +53,7 @@ module.exports = function createCustomersSupabaseRepo() {
     const { data: mappings, error: mappingsError } = await supabase
       .from('customer_vendor_services')
       .select(`
+        id,
         customer_email,
         vendor_id,
         service_id,
@@ -96,6 +97,7 @@ module.exports = function createCustomersSupabaseRepo() {
     const { data: mappings, error: mappingsError } = await supabase
       .from('customer_vendor_services')
       .select(`
+        id,
         customer_email,
         vendor_id,
         service_id,
